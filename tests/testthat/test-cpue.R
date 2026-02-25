@@ -75,3 +75,23 @@ test_that("cpue warns when catch and effort lengths differ", {
 
   expect_no_warning(cpue(100, 10))
 })
+
+
+test_that("cpue uses verbosity when option set to TRUE", {
+  withr::local_options(fishr.verbose = TRUE) # will be reset when this test_that block finishes
+
+  expect_snapshot(cpue(100, 10))
+})
+
+test_that("cpue is not verbose when option set to FALSE", {
+  withr::local_options(fishr.verbose = FALSE) # will be reset when this test_that block finishes
+
+  expect_silent(cpue(100, 10))
+})
+
+test_that("cpue verbosity falls back to FALSE when not set", {
+  withr::with_options(
+    list(fishr.verbose = NULL), # will be reset as soon as this code block executes
+    expect_no_message(cpue(100, 10))
+  )
+})
