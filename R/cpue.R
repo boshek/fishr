@@ -21,6 +21,7 @@ cpue <- function(
   method = c("ratio", "log"),
   verbose = getOption("fishr.verbose", default = FALSE)
 ) {
+  validate_numeric_inputs(catch = catch, effort = effort)
   if (verbose) {
     message("Processing ", length(catch), " records")
   }
