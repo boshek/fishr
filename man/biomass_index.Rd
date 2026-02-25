@@ -4,26 +4,52 @@
 \alias{biomass_index}
 \title{Calculate Biomass Index}
 \usage{
-biomass_index(cpue = NULL, area_swept, catch = NULL, effort = NULL, ...)
+biomass_index(
+  cpue = NULL,
+  area_swept,
+  catch = NULL,
+  effort = NULL,
+  verbose = getOption("fishr.verbose", default = FALSE),
+  ...
+)
 }
 \arguments{
-\item{cpue}{Numeric vector of CPUE values}
+\item{cpue}{Numeric vector of CPUE values. If \code{catch} and \code{effort} are
+provided, this is computed automatically.}
 
 \item{area_swept}{Numeric vector of area swept (e.g., km²)}
 
-\item{catch}{catch value numeric}
+\item{catch}{Optional numeric vector of catch. If provided with \code{effort},
+CPUE is computed via \code{cpue()}.}
 
-\item{effort}{effort value numeric}
+\item{effort}{Optional numeric vector of effort. Required if \code{catch} is
+provided.}
 
-\item{...}{arguments passed to cpue}
+\item{verbose}{Logical; print processing info? Default from
+\code{getOption("fishr.verbose", FALSE)}.}
+
+\item{...}{Additional arguments passed to \code{cpue()} when computing from
+catch and effort (e.g., \code{method}, \code{gear_factor}).}
 }
 \value{
 A numeric vector of biomass index values
 }
 \description{
-Calculates biomass index from CPUE and area swept.
+Calculates biomass index from CPUE and area swept. Can optionally
+compute CPUE from catch and effort data.
 }
 \examples{
-salmon_cpue <- cpue(catch = 2, effort = 2)
-biomass_index(cpue = salmon_cpue, area_swept = 5)
+# From pre-computed CPUE
+biomass_index(cpue = 10, area_swept = 5)
+
+# Compute CPUE on the fly
+biomass_index(area_swept = 5, catch = 100, effort = 10)
+
+# Pass method through to cpue()
+biomass_index(
+  area_swept = 5,
+  catch = c(100, 200),
+  effort = c(10, 20),
+  method = "log"
+)
 }

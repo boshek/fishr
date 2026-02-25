@@ -16,3 +16,12 @@
     Output
       [1] 10 10 30
 
+# cpue uses verbosity when option set to TRUE
+
+    Code
+      cpue(100, 10)
+    Message
+      Processing 1 records
+    Output
+      [1] 10
+
