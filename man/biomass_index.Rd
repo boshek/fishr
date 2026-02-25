@@ -38,7 +38,6 @@ A numeric vector of biomass index values
 \description{
 Calculates biomass index from CPUE and area swept. Can optionally
 compute CPUE from catch and effort data.
-See \code{\link[=cpue]{cpue()}} for computing CPUE values from raw catch and effort.
 }
 \details{
 Two modes of use:
@@ -63,4 +62,7 @@ biomass_index(
   effort = c(10, 20),
   method = "log"
 )
+}
+\seealso{
+See \code{\link[=cpue]{cpue()}} for computing CPUE values from raw catch and effort.
 }
