@@ -9,15 +9,15 @@ biomass_index(
   area_swept,
   catch = NULL,
   effort = NULL,
-  verbose = getOption("fishr.verbose", FALSE),
+  verbose = getOption("fishr.verbose", default = FALSE),
   ...
 )
 }
 \arguments{
-\item{cpue}{Numeric vector of CPUE values. If NULL, computed from \code{catch}
-and \code{effort}.}
+\item{cpue}{Numeric vector of CPUE values. If \code{catch} and \code{effort} are
+provided, this is computed automatically.}
 
-\item{area_swept}{Numeric vector of area swept (e.g., km²).}
+\item{area_swept}{Numeric vector of area swept (e.g., \strong{km^2^})}
 
 \item{catch}{Numeric vector of catch (e.g., kg).}
 
@@ -31,12 +31,41 @@ and \code{effort}.}
   \describe{
     \item{\code{x}}{Input data: a numeric vector of catch values, or a data frame
 containing catch and effort columns.}
-    \item{\code{gear_type}}{Character. Gear type used for sampling. Must be one of the
-types in the internal \code{gear_types} table. Defaults to \code{"nordic_gillnet"},
-the standard reference gear (factor = 1.0).}
+    \item{\code{gear_factor}}{Numeric scalar for gear standardization (default 1)}
     \item{\code{method}}{Character; one of \code{"ratio"} (default) or \code{"log"}.}
   }}
 }
+\value{
+A numeric vector of biomass index values
+}
 \description{
-Calculate Biomass Index
+Calculates biomass index from CPUE and area swept. Can optionally
+compute CPUE from catch and effort data. See \code{\link[=cpue]{cpue()}} for details.
+}
+\details{
+Two modes of use:
+\itemize{
+\item Provide \code{cpue} directly for a simple calculation.
+\item Provide \code{catch} and \code{effort} to compute CPUE first, then scale by area.
+}
+
+Any additional arguments in \code{...} are forwarded to \code{\link[=cpue]{cpue()}}.
+}
+\examples{
+# From pre-computed CPUE
+biomass_index(cpue = 10, area_swept = 5)
+
+# Compute CPUE on the fly
+biomass_index(area_swept = 5, catch = 100, effort = 10)
+
+# Pass method through to cpue()
+biomass_index(
+  area_swept = 5,
+  catch = c(100, 200),
+  effort = c(10, 20),
+  method = "log"
+)
+}
+\seealso{
+\code{\link[=cpue]{cpue()}} to compute CPUE values from raw catch and effort.
 }

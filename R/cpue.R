@@ -21,9 +21,7 @@ cpue.default <- function(x, ...) {
 #' @rdname cpue
 #'
 #' @param effort Numeric vector of effort (e.g., hours)
-#' @param gear_type Character. Gear type used for sampling. Must be one of the
-#'   types in the internal `gear_types` table. Defaults to `"nordic_gillnet"`,
-#'   the standard reference gear (factor = 1.0).
+#' @param gear_factor Numeric scalar for gear standardization (default 1)
 #' @param method Character; one of `"ratio"` (default) or `"log"`.
 #' @param verbose Logical; print processing info? Default from
 #'   `getOption("fishr.verbose", FALSE)`.
@@ -37,29 +35,24 @@ cpue.default <- function(x, ...) {
 cpue.numeric <- function(
   x,
   effort,
-  gear_type = "nordic_gillnet",
+  gear_factor = 1,
   method = c("ratio", "log"),
   verbose = getOption("fishr.verbose", FALSE),
   ...
 ) {
-  if (!gear_type %in% gear_types$gear_type) {
-    stop(
-      "`gear_type` must be one of: ",
-      paste(gear_types$gear_type, collapse = ", "),
-      call. = FALSE
-    )
-  }
-
-  gear_factor <- gear_types$gear_factor[gear_types$gear_type == gear_type]
-
   method <- match.arg(method)
+
   validate_numeric_inputs(x = x, effort = effort)
 
   if (verbose) {
     message("Processing ", length(x), " records using ", method, " method")
   }
 
-  raw_cpue <- switch(method, ratio = x / effort, log = log(x / effort))
+  raw_cpue <- switch(
+    method,
+    ratio = x / effort,
+    log = log(x / effort)
+  )
 
   new_cpue_result(
     cpue_values = raw_cpue * gear_factor,
@@ -77,7 +70,7 @@ cpue.data.frame <- function(
   x,
   catch_col = "catch",
   effort_col = "effort",
-  gear_type = "nordic_gillnet",
+  gear_factor = 1,
   method = c("ratio", "log"),
   verbose = getOption("fishr.verbose", FALSE),
   ...
@@ -89,10 +82,12 @@ cpue.data.frame <- function(
     stop("Column '", effort_col, "' not found in data frame.", call. = FALSE)
   }
 
+  # We can then call the numeric method by extracting the relevant columns and passing them to cpue() again.
+  # This way we reuse the existing logic and maintain a single source of truth for the CPUE calculation.
   cpue(
     x = x[[catch_col]],
     effort = x[[effort_col]],
-    gear_type = gear_type,
+    gear_factor = gear_factor,
     method = method,
     verbose = verbose,
     ...
