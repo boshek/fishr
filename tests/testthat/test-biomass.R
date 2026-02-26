@@ -15,7 +15,6 @@ test_that("biomass_index throws error on invalid input", {
   expect_snapshot(biomass_index(10, "five"), error = TRUE)
 })
 
-
 test_that("biomass_index uses verbosity when set as an option", {
   withr::local_options(fishr.verbose = TRUE)
 
@@ -27,4 +26,3 @@ test_that("biomass_index verbosity falls back to FALSE when not set", {
 
   expect_no_message(biomass_index(cpue = 5, area_swept = 100))
 })
-# Options automatically restored after each test

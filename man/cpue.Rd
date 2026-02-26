@@ -2,34 +2,63 @@
 % Please edit documentation in R/cpue.R
 \name{cpue}
 \alias{cpue}
+\alias{cpue.default}
+\alias{cpue.numeric}
+\alias{cpue.data.frame}
 \title{Calculate Catch Per Unit Effort (CPUE)}
 \usage{
-cpue(
-  catch,
+cpue(x, ...)
+
+\method{cpue}{default}(x, ...)
+
+\method{cpue}{numeric}(
+  x,
   effort,
-  gear_factor = 1,
+  gear_type = "nordic_gillnet",
   method = c("ratio", "log"),
-  verbose = getOption("fishr.verbose", default = FALSE)
+  verbose = getOption("fishr.verbose", FALSE),
+  ...
+)
+
+\method{cpue}{data.frame}(
+  x,
+  catch_col = "catch",
+  effort_col = "effort",
+  gear_type = "nordic_gillnet",
+  method = c("ratio", "log"),
+  verbose = getOption("fishr.verbose", FALSE),
+  ...
 )
 }
 \arguments{
-\item{catch}{Numeric vector of catch (e.g., kg)}
+\item{x}{Input data: a numeric vector of catch values, or a data frame
+containing catch and effort columns.}
+
+\item{...}{Additional arguments passed to methods.}
 
 \item{effort}{Numeric vector of effort (e.g., hours)}
 
-\item{gear_factor}{Numeric adjustment for gear standardization (default is 1)}
+\item{gear_type}{Character. Gear type used for sampling. Must be one of the
+types in the internal \code{gear_types} table. Defaults to \code{"nordic_gillnet"},
+the standard reference gear (factor = 1.0).}
 
-\item{method}{Character; one of "ratio" or "log"}
+\item{method}{Character; one of \code{"ratio"} (default) or \code{"log"}.}
 
-\item{verbose}{Logical indicating whether to print processing messages (default is FALSE, also accept the value of \code{fishr.verbose})}
+\item{verbose}{Logical; print processing info? Default from
+\code{getOption("fishr.verbose", FALSE)}.}
+
+\item{catch_col}{Name of the catch column (default \code{"catch"}).}
+
+\item{effort_col}{Name of the effort column (default \code{"effort"}).}
 }
 \value{
 A numeric vector of CPUE values
 }
 \description{
-Calculates CPUE from catch and effort data, with optional gear standardization.
+Calculates CPUE from catch and effort data, with optional gear
+standardization. Supports ratio and log-transformed methods.
 }
 \examples{
 cpue(100, 10)
-cpue(100, 10, gear_factor = 0.5)
+cpue(c(100, 200), c(10, 20), method = "log")
 }

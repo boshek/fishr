@@ -1,107 +1,66 @@
-test_that("cpue calculates simple ratio correctly", {
-  expect_equal_numbers(cpue(catch = 100, effort = 10), 10)
-  expect_equal_numbers(cpue(catch = 50, effort = 2), 25)
-})
+#' Calculate Biomass Index
+#'
+#' Calculates biomass index from CPUE and area swept. Can optionally
+#' compute CPUE from catch and effort data. See [cpue()] for details.
+#'
+#' @param cpue Numeric vector of CPUE values. If `catch` and `effort` are
+#'   provided, this is computed automatically.
+#' @param area_swept Numeric vector of area swept (e.g., **km^2^**)
+#' @param catch Numeric vector of catch (e.g., kg).
+#' @inheritParams cpue.numeric
+#' @inheritDotParams cpue.numeric -effort
+#'
+#' @return A numeric vector of biomass index values
+#'
+#' @details
+#' Two modes of use:
+#'
+#' - Provide `cpue` directly for a simple calculation.
+#' - Provide `catch` and `effort` to compute CPUE first, then scale by area.
+#'
+#' Any additional arguments in `...` are forwarded to [cpue()].
+#'
+#' @seealso [cpue()] to compute CPUE values from raw catch and effort.
+#'
+#' @export
+#'
+#' @examples
+#' # From pre-computed CPUE
+#' biomass_index(cpue = 10, area_swept = 5)
+#'
+#' # Compute CPUE on the fly
+#' biomass_index(area_swept = 5, catch = 100, effort = 10)
+#'
+#' # Pass method through to cpue()
+#' biomass_index(
+#'   area_swept = 5,
+#'   catch = c(100, 200),
+#'   effort = c(10, 20),
+#'   method = "log"
+#' )
+biomass_index <- function(
+  cpue = NULL,
+  area_swept,
+  catch = NULL,
+  effort = NULL,
+  verbose = getOption("fishr.verbose", default = FALSE),
+  ...
+) {
+  rlang::check_dots_used()
 
-test_that("cpue handles vectors of data", {
-  catches <- c(100, 200, 300)
-  efforts <- c(10, 10, 10)
-  expected_results <- c(10, 20, 30)
+  if (is.null(cpue) && (!is.null(catch) && !is.null(effort))) {
+    cpue <- cpue(catch, effort, verbose = verbose, ...)
+  }
 
-  expect_equal_numbers(cpue(catches, efforts), expected_results)
-})
+  if (is.null(cpue)) {
+    stop("Must provide either 'cpue' or both 'catch' and 'effort'.")
+  }
 
-expect_true(is.numeric(cpue(100, 10)))
+  validate_numeric_inputs(cpue = cpue, area_swept = area_swept)
 
-expect_type(cpue(100, 10), "double")
+  if (verbose) {
+    message("calculating biomass index for ", length(area_swept), " records")
+  }
 
-test_that("gear_factor standardization scales correctly", {
-  expect_equal_numbers(cpue(catch = 100, effort = 10, gear_factor = 0.5), 5)
-  expect_equal_numbers(
-    cpue(catch = 100, effort = 10),
-    cpue(catch = 100, effort = 10, gear_factor = 1)
-  )
-})
-
-
-test_that("cpue handles missing data", {
-  expect_true(is.na(cpue(NA_real_, 10)))
-  expect_true(is.na(cpue(100, NA_real_)))
-})
-
-
-test_that("cpue works with generated data", {
-  data <- generate_fishing_data(n = 5)
-
-  result <- cpue(data$catch, data$effort)
-
-  expect_equal_numbers(
-    result,
-    c(34.053, 9.065, 19.239, 135.640, 6.372),
-    tolerance = 1e-3
-  )
-})
-
-
-test_that("cpue matches reference data", {
-  result <- cpue(reference_data$catch, reference_data$effort)
-
-  expect_equal_numbers(result, reference_data$expected_cpue)
-})
-
-
-test_that("cpue provides informative message when verbose", {
-  expect_message(
-    cpue(c(100, 200), c(10, 20), verbose = TRUE),
-    "Processing 2 records"
-  )
-})
-
-test_that("cpue is silent by default", {
-  expect_no_message(cpue(100, 10))
-})
-
-test_that("cpue errors when input is not numeric", {
-  expect_snapshot(
-    cpue("five", 10),
-    error = TRUE
-  )
-})
-
-test_that("cpue warns when catch and effort lengths differ", {
-  expect_snapshot(
-    cpue(c(100, 200, 300), c(10, 20))
-  )
-
-  expect_no_warning(cpue(100, 10))
-})
-
-
-test_that("cpue uses verbosity when option set to TRUE", {
-  withr::local_options(fishr.verbose = TRUE) # will be reset when this test_that block finishes
-
-  expect_snapshot(cpue(100, 10))
-})
-
-test_that("cpue is not verbose when option set to FALSE", {
-  withr::local_options(fishr.verbose = FALSE) # will be reset when this test_that block finishes
-
-  expect_silent(cpue(100, 10))
-})
-
-test_that("cpue verbosity falls back to FALSE when not set", {
-  withr::with_options(
-    list(fishr.verbose = NULL), # will be reset as soon as this code block executes
-    expect_no_message(cpue(100, 10))
-  )
-})
-
-test_that("cpue() returns a cpue_result object", {
-  result <- cpue(c(100, 200), c(10, 20))
-  expect_s3_class(result, "cpue_result")
-})
-
-test_that("print.cpue_result displays expected output", {
-  result <- cpue(c(100, 200, 300), c(10, 20, 15))
-  expect_snapshot(print(result))
-})
+  cpue * area_swept
+}

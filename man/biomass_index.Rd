@@ -9,7 +9,7 @@ biomass_index(
   area_swept,
   catch = NULL,
   effort = NULL,
-  verbose = getOption("fishr.verbose", default = FALSE),
+  verbose = getOption("fishr.verbose", FALSE),
   ...
 )
 }
@@ -17,52 +17,26 @@ biomass_index(
 \item{cpue}{Numeric vector of CPUE values. If NULL, computed from \code{catch}
 and \code{effort}.}
 
-\item{area_swept}{Numeric vector of area swept (e.g., km^2^).}
+\item{area_swept}{Numeric vector of area swept (e.g., km²).}
 
-\item{catch}{Numeric vector of catch (e.g., kg)}
+\item{catch}{Numeric vector of catch (e.g., kg).}
 
 \item{effort}{Numeric vector of effort (e.g., hours)}
 
-\item{verbose}{Logical indicating whether to print processing messages (default is FALSE, also accept the value of \code{fishr.verbose})}
+\item{verbose}{Logical; print processing info? Default from
+\code{getOption("fishr.verbose", FALSE)}.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=cpue]{cpue}}
+  Arguments passed on to \code{\link[=cpue.numeric]{cpue.numeric}}
   \describe{
-    \item{\code{gear_factor}}{Numeric adjustment for gear standardization (default is 1)}
-    \item{\code{method}}{Character; one of "ratio" or "log"}
+    \item{\code{x}}{Input data: a numeric vector of catch values, or a data frame
+containing catch and effort columns.}
+    \item{\code{gear_type}}{Character. Gear type used for sampling. Must be one of the
+types in the internal \code{gear_types} table. Defaults to \code{"nordic_gillnet"},
+the standard reference gear (factor = 1.0).}
+    \item{\code{method}}{Character; one of \code{"ratio"} (default) or \code{"log"}.}
   }}
 }
-\value{
-A numeric vector of biomass index values
-}
 \description{
-Calculates biomass index from CPUE and area swept. Can optionally
-compute CPUE from catch and effort data.
-}
-\details{
-Two modes of use:
-\itemize{
-\item Provide \code{cpue} directly for a simple calculation.
-\item Provide \code{catch} and \code{effort} to compute CPUE first, then scale by area.
-}
-
-Any additional arguments in \code{...} are forwarded to \code{\link[=cpue]{cpue()}}.
-}
-\examples{
-# From pre-computed CPUE
-biomass_index(cpue = 10, area_swept = 5)
-
-# Compute CPUE on the fly
-biomass_index(area_swept = 5, catch = 100, effort = 10)
-
-# Pass method through to cpue()
-biomass_index(
-  area_swept = 5,
-  catch = c(100, 200),
-  effort = c(10, 20),
-  method = "log"
-)
-}
-\seealso{
-See \code{\link[=cpue]{cpue()}} for computing CPUE values from raw catch and effort.
+Calculate Biomass Index
 }
