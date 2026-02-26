@@ -18,3 +18,12 @@ validate_numeric_inputs <- function(...) {
 
   invisible(NULL)
 }
+
+
+standardize_effort <- function(catch, effort_hours) {
+  validate_numeric_inputs(catch = catch, effort_hours = effort_hours)
+
+  effort_days <- effort_hours * 24
+
+  cpue(catch = catch, effort = effort_days)
+}

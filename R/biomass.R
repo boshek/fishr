@@ -1,14 +1,16 @@
 #' Calculate Biomass Index
 #'
 #' Calculates biomass index from CPUE and area swept. Can optionally
-#' compute CPUE from catch and effort data.
+#' compute CPUE from catch and effort data. See [cpue()] for details.
 #'
+#' @param cpue Numeric vector of CPUE values. If `catch` and `effort` are
+#'   provided, this is computed automatically.
+#' @param area_swept Numeric vector of area swept (e.g., **km^2^**)
+#' @param catch Numeric vector of catch (e.g., kg).
+#' @inheritParams cpue.numeric
+#' @inheritDotParams cpue.numeric -effort
 #'
-#' @param cpue Numeric vector of CPUE values. If NULL, computed from `catch`
-#'   and `effort`.
-#' @param area_swept Numeric vector of area swept (e.g., km^2^).
-#' @inheritParams cpue
-#' @inheritDotParams cpue -catch -effort
+#' @return A numeric vector of biomass index values
 #'
 #' @details
 #' Two modes of use:
@@ -18,10 +20,9 @@
 #'
 #' Any additional arguments in `...` are forwarded to [cpue()].
 #'
-#' @return A numeric vector of biomass index values
-#' @export
+#' @seealso [cpue()] to compute CPUE values from raw catch and effort.
 #'
-#' @seealso See [cpue()] for computing CPUE values from raw catch and effort.
+#' @export
 #'
 #' @examples
 #' # From pre-computed CPUE
